@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exiom V2 | Intelligence RH</title>
+    <link rel="icon" href="https://visvyzhogpexmdjwjjlz.supabase.co/storage/v1/object/sign/images/X%20logo%20exiom%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81ZjUxNGJmZS02ZTZhLTQyZmQtYjVkMC02ZGRkZDY0YjkwOGQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvWCBsb2dvIGV4aW9tICgxKS5wbmciLCJpYXQiOjE3NzIxMzcwNzgsImV4cCI6MjA4NzQ5NzA3OH0.KsKFGEVvaOk7exa5mPzh1srThwOr174M-Oz_fBQQWFY">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root { --apple-bg: #f5f5f7; --apple-card: rgba(255, 255, 255, 0.9); --apple-blue: #007AFF; }
+        body { background-color: var(--apple-bg); font-family: 'Inter', sans-serif; color: #1d1d1f; margin: 0; }
+        .glass { background: var(--apple-card); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); }
+        .apple-shadow { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); }
+        .hidden { display: none !important; }
+        .nav-btn-active { background-color: #1d1d1f; color: #fff !important; }
+        .grade-cb:checked + div { background-color: #007AFF; color: white; border-color: #007AFF; }
+        #splash-screen { position: fixed; inset: 0; background-color: #ffffff; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; opacity: 0; transition: opacity 0.6s ease; }
+        .splash-main-container { position: relative; width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; }
+        .loader-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff, #ff0000); animation: spin 1s linear infinite; -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 0); }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .splash-logo { width: 80px; height: auto; position: relative; }
+        .splash-title { font-size: 1.1rem; color: #1d1d1f; font-weight: 700; letter-spacing: -0.2px; opacity: 0.8; margin: 0; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-main-container">
+            <div class="loader-ring"></div>
+            <img src="https://visvyzhogpexmdjwjjlz.supabase.co/storage/v1/object/sign/images/Logo%20exiom.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81ZjUxNGJmZS02ZTZhLTQyZmQtYjVkMC02ZGRkZDY0YjkwOGQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvTG9nbyBleGlvbS5wbmciLCJpYXQiOjE3NzIxMzcxMTcsImV4cCI6MjA4NzQ5NzExN30.BF-na_wJlrxOv3H5YB0_sQIQpfinsAbfb5F4YyqgnJs" alt="Logo Exiom" class="splash-logo">
+        </div>
+        <h1 class="splash-title">Exiom Dashboard Offboarding</h1>
+    </div>
+
+    <div id="login-view" class="flex items-center justify-center h-screen">
+        <div class="glass p-12 rounded-[40px] apple-shadow w-[420px] text-center">
+            <img src="https://visvyzhogpexmdjwjjlz.supabase.co/storage/v1/object/sign/images/Logo%20exiom.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81ZjUxNGJmZS02ZTZhLTQyZmQtYjVkMC02ZGRkZDY0YjkwOGQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvTG9nbyBleGlvbS5wbmciLCJpYXQiOjE3NzIxMzcxMTcsImV4cCI6MjA4NzQ5NzExN30.BF-na_wJlrxOv3H5YB0_sQIQpfinsAbfb5F4YyqgnJs" class="h-10 mx-auto mb-10">
+            <form id="login-form" class="space-y-4 text-left">
+                <input type="email" id="email" placeholder="Email" class="w-full p-4 bg-white/50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <input type="password" id="password" placeholder="Mot de passe" class="w-full p-4 bg-white/50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <button type="submit" class="w-full bg-[#1d1d1f] text-white p-4 rounded-2xl font-medium mt-6 hover:bg-gray-800 transition">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="hidden min-h-screen flex flex-col">
+        <nav class="glass sticky top-0 z-40 px-8 py-4 flex justify-between items-center border-b border-gray-200/50">
+            <div class="flex items-center gap-12">
+                <img src="https://visvyzhogpexmdjwjjlz.supabase.co/storage/v1/object/sign/images/Logo%20exiom.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV81ZjUxNGJmZS02ZTZhLTQyZmQtYjVkMC02ZGRkZDY0YjkwOGQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvTG9nbyBleGlvbS5wbmciLCJpYXQiOjE3NzIxMzcxMTcsImV4cCI6MjA4NzQ5NzExN30.BF-na_wJlrxOv3H5YB0_sQIQpfinsAbfb5F4YyqgnJs" class="h-6">
+                <div class="flex bg-gray-200/50 p-1 rounded-2xl">
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-6 py-2 rounded-xl text-sm font-semibold nav-btn-active transition">Dashboard</button>
+                    <button onclick="switchTab('responses')" id="btn-responses" class="px-6 py-2 rounded-xl text-sm font-semibold text-gray-500 transition relative">
+                        Réponses
+                        <span id="notif-badge" class="hidden absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white border-2 border-white">0</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="btn-settings" class="px-6 py-2 rounded-xl text-sm font-semibold text-gray-500 transition"><i class="fa-solid fa-gear mr-2"></i>Paramètres</button>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="refreshData()" id="btn-refresh" class="w-8 h-8 rounded-full bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <button onclick="logout()" class="text-xs font-bold text-red-500 uppercase tracking-widest hover:text-red-600 transition">Déconnexion</button>
+            </div>    
+        </nav>
+
+        <main class="max-w-[1200px] mx-auto w-full px-6 py-12">
+            <div id="loading-state" class="hidden flex justify-center py-20">
+                <div class="text-gray-400 font-medium animate-pulse">Chargement des données V2...</div>
+            </div>
+
+            <div id="tab-responses" class="hidden mt-10">
+                <div class="max-w-2xl mx-auto mb-10">
+                    <div class="glass flex items-center p-2 rounded-[20px] apple-shadow">
+                        <div class="w-10 h-10 flex items-center justify-center text-gray-400"><i class="fa-solid fa-search"></i></div>
+                        <input type="text" id="search-input" oninput="renderTable()" placeholder="Rechercher un collaborateur par nom..." class="bg-transparent border-none outline-none w-full text-sm font-medium h-10">
+                    </div>
+                </div>
+                <div class="glass rounded-[32px] apple-shadow overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <th class="px-8 py-6 cursor-pointer hover:text-blue-600 transition group" onclick="sortTable('date')">Date <i class="fa-solid fa-sort ml-1 opacity-30 group-hover:opacity-100"></i></th>
+                                <th class="px-8 py-6">Collaborateur</th>
+                                <th class="px-8 py-6 cursor-pointer hover:text-blue-600 transition group" onclick="sortTable('fonction')">Fonction <i class="fa-solid fa-sort ml-1 opacity-30 group-hover:opacity-100"></i></th>
+                                <th class="px-8 py-6 text-center cursor-pointer hover:text-blue-600 transition group" onclick="sortTable('note')">Note <i class="fa-solid fa-sort ml-1 opacity-30 group-hover:opacity-100"></i></th>
+                                <th class="px-8 py-6 text-right">Fiche</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>        
+
+            <div id="stats-content" class="space-y-16">
+                <section>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 tracking-widest border-b border-gray-200 pb-2">1. Filtrage par Population</h3>
+                    <div id="grade-checkboxes" class="flex flex-wrap gap-3 animate-fade-in"></div>
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 tracking-widest border-b border-gray-200 pb-2">2. Vue d'ensemble</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="glass p-8 rounded-[32px] apple-shadow">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Collaborateurs Analysés</span>
+                            <div class="text-5xl font-bold mt-3 text-gray-900" id="stat-total">-</div>
+                        </div>
+                        <div class="glass p-8 rounded-[32px] apple-shadow">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Contacts Conservés</span>
+                            <div class="text-5xl font-bold mt-3 text-blue-600" id="stat-contact">-</div>
+                        </div>
+                        <div class="glass p-8 rounded-[32px] apple-shadow">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Note Moyenne Globale</span>
+                            <div class="text-5xl font-bold mt-3 text-gray-900" id="stat-note">-</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 tracking-widest border-b border-gray-200 pb-2">3. Analyses Textuelles & Répartition</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="container-graphs"></div>
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 tracking-widest border-b border-gray-200 pb-2">4. Scores Moyens (/5)</h3>
+                    <div class="glass p-10 rounded-[32px] apple-shadow">
+                        <div class="grid grid-cols-2 md:grid-cols-6 gap-8 text-center" id="container-scores"></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 tracking-widest border-b border-gray-200 pb-2">5. Indicateurs Oui / Non</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="container-binary"></div>
+                </section>
+            </div>
+
+            <div id="settings-view" class="hidden">
+                <div class="glass p-8 rounded-[32px] apple-shadow max-w-4xl mx-auto min-h-[600px] flex flex-col">
+                    <div class="flex items-center justify-between mb-8 border-b border-gray-100 pb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Configuration</h2>
+                        <div class="flex bg-gray-100 p-1 rounded-xl">
+                            <button onclick="switchSubTab('dashboard_config')" id="btn-sub-dash" class="px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest bg-white shadow-sm transition">Vue Dashboard</button>
+                            <button onclick="switchSubTab('questions_config')" id="btn-sub-quest" class="px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-200 transition">Questions Formulaire</button>
+                        </div>
+                    </div>
+
+                    <div id="subtab-dashboard_config" class="animate-fade-in">
+                        <div class="bg-blue-50 p-6 rounded-2xl mb-6 flex items-start gap-4">
+                            <div class="text-blue-500 mt-1"><i class="fa-solid fa-eye"></i></div>
+                            <div>
+                                <h3 class="text-sm font-bold text-blue-900">Visibilité des données</h3>
+                                <p class="text-xs text-blue-700 mt-1">Cochez les éléments que vous souhaitez voir apparaître sur le Dashboard.</p>
+                            </div>
+                        </div>
+                        <div id="dashboard-visibility-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <div id="subtab-questions_config" class="hidden animate-fade-in">
+                        <div class="bg-gray-50 p-6 rounded-2xl mb-8 border border-gray-200">
+                            <h3 class="text-sm font-bold text-gray-900 mb-4"><i class="fa-solid fa-plus mr-2"></i>Créer une nouvelle question</h3>
+                            <form id="add-question-form" class="space-y-4 relative">
+                                <input type="hidden" id="form-mode" value="create">
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Question affichée (Formulaire)</label>
+                                        <input type="text" id="q-label" class="w-full p-3 rounded-xl border border-gray-200 text-sm" placeholder="ex: Comment évalues-tu l'ambiance ?" required>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ID Unique (Technique)</label>
+                                        <input type="text" id="q-id" class="w-full p-3 rounded-xl border border-gray-200 text-sm disabled:bg-gray-100 disabled:text-gray-400" placeholder="ex: ambiance_score" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type de réponse</label>
+                                        <select id="q-type" class="w-full p-3 rounded-xl border border-gray-200 text-sm bg-white" onchange="toggleOptionsInput()">
+                                            <option value="scale_1_5">Note de 1 à 5 (Score)</option>
+                                            <option value="scale_1_10">Note de 1 à 10 (Score)</option>
+                                            <option value="yes_no">Oui / Non (Binaire)</option>
+                                            <option value="radio_list">Choix Multiple (Graphique)</option>
+                                            <option value="textarea">Réponse Libre (Texte)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Titre Court (Dashboard)</label>
+                                        <input type="text" id="q-dashboard-label" class="w-full p-3 rounded-xl border border-gray-200 text-sm bg-white" placeholder="ex: Ambiance">
+                                        <p class="text-[9px] text-gray-400 mt-1 italic">Si vide, la question complète sera utilisée.</p>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Cible (Public)</label>
+                                        <select id="q-target" class="w-full p-3 rounded-xl border-2 border-blue-100 bg-blue-50 text-sm focus:border-blue-500 outline-none">
+                                            <option value="ALL">Tout le monde</option>
+                                            <option value="CDI">CDI</option>
+                                            <option value="STAGIAIRE">Stagiaires & Apprentis</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div id="options-container" class="hidden animate-fade-in">
+                                    <label class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Options de réponse (Séparées par des virgules)</label>
+                                    <input type="text" id="q-options" class="w-full p-3 rounded-xl border-2 border-blue-100 bg-blue-50 text-sm focus:border-blue-500 outline-none" placeholder="Ex: Paris, Lyon, Marseille">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mt-2 mb-4 border-t border-gray-100 pt-4">
+                                    <div>
+                                        <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Question Parente</label>
+                                        <select id="q-parent" onchange="updateParentConditionOptions()" class="w-full p-3 rounded-xl border-2 border-orange-100 bg-orange-50 text-sm focus:border-orange-500 outline-none">
+                                            <option value="">Aucune (Toujours visible)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">S'affiche si la réponse est :</label>
+                                        <div id="q-parent-condition-container" class="w-full p-3 rounded-xl border-2 border-orange-100 bg-orange-50 min-h-[46px] max-h-32 overflow-y-auto flex flex-col gap-2">
+                                            <span class="text-xs text-gray-400 italic">Sélectionnez un parent...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3">
+                                    <button type="submit" id="btn-submit-question" class="flex-1 bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-black transition text-sm">Ajouter au Formulaire</button>
+                                    <button type="button" id="btn-cancel-edit" onclick="resetForm()" class="hidden px-6 py-3 rounded-xl bg-gray-200 text-gray-600 font-bold hover:bg-gray-300 transition text-sm">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Questions Actives (Glisser pour ordonner)</h3>
+                        <div id="questions-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-chart" class="fixed inset-0 z-[70] flex items-center justify-center p-6 hidden">
+        <div class="fixed inset-0 bg-white/60 backdrop-blur-xl" onclick="closeChartModal()"></div>
+        <div class="glass w-full max-w-3xl rounded-[40px] apple-shadow z-20 p-10 flex flex-col relative bg-white">
+            <button onclick="closeChartModal()" class="absolute top-6 right-6 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition"><i class="fa-solid fa-xmark"></i></button>
+            <h2 id="chart-modal-title" class="text-2xl font-bold text-center mb-8">Analyse</h2>
+            <div class="flex-1 flex items-center justify-center w-full h-[400px]">
+                <canvas id="modal-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-detail" class="fixed inset-0 z-[70] flex items-center justify-center p-6 hidden">
+        <div class="fixed inset-0 bg-white/60 backdrop-blur-xl" onclick="closeDetailModal()"></div>
+        <div class="glass w-full max-w-5xl max-h-[90vh] rounded-[40px] apple-shadow z-20 flex flex-col border border-white bg-white overflow-hidden">
+            <div class="px-10 py-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h2 id="modal-name" class="text-2xl font-bold text-gray-900">Nom Prénom</h2>
+                    <p id="modal-grade" class="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">Fonction</p>
+                </div>
+                <button onclick="closeDetailModal()" class="w-10 h-10 bg-white rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-10 overflow-y-auto space-y-12" id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://xzksnuqmrpspuljrbpul.supabase.co';
+        const supabaseKey = 'sb_publishable_AJWejPG4k-7XaZCaC__DAg_hmw5CPS5'; 
+        const rhClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        let unreadCount = 0;
+        let currentSort = { column: 'date', direction: 'desc' };
+        let allResponses = [];
+        let filteredResponses = [];
+        let configList = [];
+        let activeChart = null;
+        let dragSrcId = null;
+
+        const appleColors = ['#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#5856D6', '#5AC8FA'];
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { error } = await rhClient.auth.signInWithPassword({ email: e.target.email.value, password: e.target.password.value });
+            if (error) Swal.fire({ title: 'Erreur d\'accès', text: 'Identifiants invalides.', icon: 'error', confirmButtonColor: '#1d1d1f' });
+            else startApp();
+        });
+
+        async function logout() { await rhClient.auth.signOut(); window.location.reload(); }
+        async function checkSession() { const { data: { session } } = await rhClient.auth.getSession(); if (session) startApp(); }
+        checkSession();
+
+        async function fetchConfig() {
+            const { data } = await rhClient.from('questions_master').select('*').eq('is_active', true).order('order_index');
+            configList = data || [];
+        }
+
+        async function fetchData() {
+            const { data } = await rhClient.from('offboarding_responses_v2').select('*');
+            allResponses = data || [];
+            filteredResponses = [...allResponses];
+        }
+
+        async function refreshData() {
+            const btn = document.getElementById('btn-refresh');
+            const icon = btn.querySelector('i');
+            icon.classList.add('fa-spin');
+            btn.disabled = true;
+            await Promise.all([fetchConfig(), fetchData()]);
+            initGradeFilters(); 
+            renderTable();     
+            renderDashboard();  
+            renderSettings();  
+            icon.classList.remove('fa-spin');
+            btn.disabled = false;
+        }
+
+        function renderDashboard() {
+            const data = filteredResponses;
+            document.getElementById('stat-total').textContent = data.length;
+            document.getElementById('stat-contact').textContent = data.filter(r => r.contact_futur === 'Oui').length;
+            const noteAvg = data.reduce((acc, curr) => acc + (parseInt(curr.answers?.note_globale || 0)), 0) / (data.length || 1);
+            document.getElementById('stat-note').innerHTML = data.length ? `${noteAvg.toFixed(1)}<span class="text-lg text-gray-300">/10</span>` : '-';
+
+            const graphsContainer = document.getElementById('container-graphs');
+            const scoresContainer = document.getElementById('container-scores');
+            const binaryContainer = document.getElementById('container-binary');
+
+            graphsContainer.innerHTML = '';
+            scoresContainer.innerHTML = '';
+            binaryContainer.innerHTML = '';
+
+            configList.forEach(conf => {
+                const section = conf.dashboard_section;
+                if(section === 'hidden') return; 
+
+                // 💡 Utilisation du Label Personnalisé pour le Dashboard
+                const displayLabel = conf.dashboard_label && conf.dashboard_label.trim() !== '' ? conf.dashboard_label : conf.label;
+
+                if(section === 'graph') {
+                    // Filtrage des réponses vides pour les graphiques
+                    const validDataForGraph = data.filter(curr => curr.answers?.[conf.id] && curr.answers[conf.id].trim() !== '');
+                    if (validDataForGraph.length === 0) return;
+
+                    const counts = countAnswers(validDataForGraph, conf.id);
+                    const topVal = getTop(counts);
+                    const gType = conf.graph_type || 'doughnut';
+                    graphsContainer.innerHTML += `
+                        <div class="glass p-8 rounded-[32px] apple-shadow hover-card flex flex-col justify-between h-64" onclick="openChartModal('${conf.id}', '${displayLabel}', '${gType}')">
+                            <div><h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">${displayLabel}</h3><div class="text-2xl font-bold mt-2 text-gray-900 truncate">${topVal}</div><div class="text-xs text-gray-500 mt-1">Majoritaire (sur ${validDataForGraph.length} rép.)</div></div>
+                            <span class="text-xs font-bold text-blue-600 mt-4 cursor-pointer">Voir le détail &rarr;</span>
+                        </div>`;
+                } else if(section === 'score') {
+                    if(conf.id === 'note_globale') return;
+                    
+                    // Filtrage des réponses vides pour les scores
+                    const validScores = data.filter(curr => curr.answers?.[conf.id] && !isNaN(parseInt(curr.answers[conf.id])));
+                    if (validScores.length === 0) return;
+                    
+                    const totalScore = validScores.reduce((acc, curr) => acc + parseInt(curr.answers[conf.id]), 0);
+                    const avg = totalScore / validScores.length;
+                    
+                    scoresContainer.innerHTML += `<div><span class="block text-[9px] font-bold text-gray-400 uppercase mb-2 tracking-widest">${displayLabel}</span><span class="text-3xl font-bold text-gray-900">${avg.toFixed(1)}</span><div class="text-[8px] text-gray-400 mt-1">${validScores.length} rep.</div></div>`;
+                } else if(section === 'binary') {
+                    const yes = data.filter(r => r.answers?.[conf.id] === 'Oui').length;
+                    const no = data.filter(r => r.answers?.[conf.id] === 'Non').length;
+                    const total = yes + no;
+                    
+                    if (total === 0) return;
+
+                    const pct = Math.round((yes / total) * 100);
+                    binaryContainer.innerHTML += `<div class="glass p-6 rounded-[24px] apple-shadow flex items-center justify-between"><div><h4 class="font-bold text-gray-900">${displayLabel}</h4><div class="text-xs text-gray-500 mt-1">${yes} Oui / ${no} Non</div></div><div class="text-2xl font-bold ${pct >= 50 ? 'text-green-500' : 'text-orange-500'}">${pct}%</div></div>`;
+                }
+            });
+        }
+
+        function sortTable(column) {
+            if (currentSort.column === column) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            else { currentSort.column = column; currentSort.direction = 'asc'; }
+            renderTable(); 
+        }
+
+        function renderTable() {
+            const search = document.getElementById('search-input')?.value.toLowerCase() || "";
+            let filtered = filteredResponses.filter(r => (r.collaborateur || "").toLowerCase().includes(search));
+            filtered.sort((a, b) => {
+                let valA, valB;
+                if (currentSort.column === 'date') { valA = new Date(a.date_form); valB = new Date(b.date_form); } 
+                else if (currentSort.column === 'fonction') { valA = (a.fonction || "").toLowerCase(); valB = (b.fonction || "").toLowerCase(); } 
+                else if (currentSort.column === 'note') { valA = parseInt(a.answers?.note_globale || 0); valB = parseInt(b.answers?.note_globale || 0); }
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            document.getElementById('table-body').innerHTML = filtered.map(r => {
+                const note = r.answers?.note_globale || '-';
+                const dateStr = new Date(r.date_form).toLocaleDateString();
+                return `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-none">
+                    <td class="px-8 py-6 text-sm text-gray-500">${dateStr}</td>
+                    <td class="px-8 py-6 font-bold text-gray-900">${r.collaborateur}</td>
+                    <td class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-gray-400">${r.fonction}</td>
+                    <td class="px-8 py-6 text-center font-bold text-blue-600">${note}</td>
+                    <td class="px-8 py-6 text-right">
+                        <div class="flex items-center justify-end gap-3">
+                            <button onclick="deleteResponse('${r.id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 transition" title="Supprimer ce bilan"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="openDetailModal('${r.id}')" class="text-xs font-bold uppercase tracking-widest bg-gray-100 hover:bg-gray-900 hover:text-white px-5 py-2 rounded-full transition">Voir</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function deleteResponse(id) {
+            Swal.fire({ title: 'Supprimer ce bilan ?', text: "Cette action est définitive et supprimera la ligne en base de données.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF3B30', cancelButtonColor: '#1d1d1f', confirmButtonText: 'Oui, supprimer', cancelButtonText: 'Conserver' }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const { error } = await rhClient.from('offboarding_responses_v2').delete().eq('id', id);
+                    if (error) Swal.fire('Erreur', "Problème lors de la suppression : " + error.message, 'error');
+                    else {
+                        allResponses = allResponses.filter(r => r.id != id);
+                        filteredResponses = filteredResponses.filter(r => r.id != id);
+                        renderTable(); renderDashboard();
+                        Swal.fire({ title: 'Supprimé !', text: 'Le bilan a été effacé.', icon: 'success', timer: 1500, showConfirmButton: false });
+                    }
+                }
+            });
+        }
+
+        function openDetailModal(id) {
+            const r = allResponses.find(x => x.id == id);
+            if (!r) return;
+            const getVal = (key) => r.answers?.[key] || '-';
+            const valToIcon = (val) => {
+                if (val === 'Oui') return '<div class="flex items-center gap-2 whitespace-nowrap text-green-600 font-bold"><i class="fa-solid fa-check"></i><span>Oui</span></div>';
+                if (val === 'Non') return '<div class="flex items-center gap-2 whitespace-nowrap text-red-500 font-bold"><i class="fa-solid fa-xmark"></i><span>Non</span></div>';
+                return '<div class="whitespace-nowrap text-gray-400">-</div>';
+            };
+            document.getElementById('modal-name').textContent = r.collaborateur;
+            document.getElementById('modal-grade').textContent = r.fonction;
+
+            let htmlScores = '', htmlBinary = '', htmlTextCharts = '';
+            configList.forEach(conf => {
+                const val = getVal(conf.id);
+                // 💡 Filtrage des valeurs vides ou non répondues dans la modale
+                if (conf.id === 'note_globale' || val === '-' || val === null || val.trim() === '') return;
+                
+                const type = conf.input_type;
+                const displayLabel = conf.dashboard_label && conf.dashboard_label.trim() !== '' ? conf.dashboard_label : conf.label;
+
+                if (type === 'scale_1_5' || type === 'scale_1_10') htmlScores += `<div class="p-4 bg-gray-50 rounded-2xl flex flex-col items-center justify-center"><div class="text-3xl font-bold text-gray-900 mb-1">${val}</div><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center leading-tight">${displayLabel}</div></div>`;
+                else if (type === 'yes_no') htmlBinary += `<div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-0"><span class="text-sm font-medium text-gray-600 flex-1 pr-4">${displayLabel}</span>${valToIcon(val)}</div>`;
+                else if (type === 'radio_list') htmlTextCharts += `<div class="mb-6"><h4 class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">${displayLabel}</h4><p class="text-lg font-medium text-gray-900 bg-blue-50/50 p-4 rounded-xl border border-blue-100">${val}</p></div>`;
+            });
+
+            // 💡 Récupération des questions de type texte Libre pour les afficher en bas
+            const textQuestions = configList.filter(q => q.input_type === 'textarea' && q.id !== 'note_globale');
+            let htmlOpenText = '';
+            textQuestions.forEach(q => { 
+                const val = getVal(q.id);
+                if (val !== '-' && val !== null && val.trim() !== '') {
+                     const displayLabel = q.dashboard_label && q.dashboard_label.trim() !== '' ? q.dashboard_label : q.label;
+                     htmlOpenText += `<div class="mb-8"><h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">${displayLabel}</h4><p class="text-gray-700 italic border-l-4 border-gray-200 pl-4">"${val}"</p></div>`; 
+                }
+            });
+
+            document.getElementById('modal-content').innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-12 gap-12"><div class="lg:col-span-7 space-y-10"><div class="p-8 bg-blue-600 rounded-[32px] text-white shadow-xl shadow-blue-200 flex items-center justify-between"><div><div class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Note Globale</div><div class="text-6xl font-bold">${getVal('note_globale')}<span class="text-2xl opacity-60 font-normal">/10</span></div></div><div class="text-right"><div class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Ancienneté</div><div class="text-xl font-bold">${r.anciennete || '-'}</div></div></div><div>${htmlTextCharts}</div><div class="pt-8 border-t border-gray-100">${htmlOpenText}</div></div><div class="lg:col-span-5 space-y-8"><div class="glass p-6 rounded-[32px] border border-gray-100"><h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 text-center">Évaluations</h4><div class="grid grid-cols-2 gap-3">${htmlScores}</div></div><div class="glass p-8 rounded-[32px] border border-gray-100"><h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Indicateurs</h4><div class="space-y-1">${htmlBinary}</div></div><div class="text-center p-6 bg-gray-50 rounded-3xl"><div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Contact Futur</div><div class="font-bold text-gray-900 text-lg mb-1">${r.contact_futur === 'Oui' ? '<i class="fa-solid fa-check text-green-500 mr-2"></i>Souhaité' : '<i class="fa-solid fa-xmark text-gray-400 mr-2"></i>Non souhaité'}</div>${r.email_contact ? `<div class="text-blue-600 text-sm">${r.email_contact}</div>` : ''}</div></div></div>`;
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+        function closeDetailModal() { document.getElementById('modal-detail').classList.add('hidden'); }
+
+        function switchSubTab(subtab) {
+            document.getElementById('subtab-dashboard_config').classList.toggle('hidden', subtab !== 'dashboard_config');
+            document.getElementById('subtab-questions_config').classList.toggle('hidden', subtab !== 'questions_config');
+            const btnDash = document.getElementById('btn-sub-dash'), btnQuest = document.getElementById('btn-sub-quest');
+            if(subtab === 'dashboard_config') { btnDash.classList.add('bg-white', 'shadow-sm', 'text-gray-900'); btnDash.classList.remove('text-gray-500', 'hover:bg-gray-200'); btnQuest.classList.remove('bg-white', 'shadow-sm', 'text-gray-900'); btnQuest.classList.add('text-gray-500', 'hover:bg-gray-200'); } 
+            else { btnQuest.classList.add('bg-white', 'shadow-sm', 'text-gray-900'); btnQuest.classList.remove('text-gray-500', 'hover:bg-gray-200'); btnDash.classList.remove('bg-white', 'shadow-sm', 'text-gray-900'); btnDash.classList.add('text-gray-500', 'hover:bg-gray-200'); }
+        }
+
+        function renderSettings() {
+            const dashList = document.getElementById('dashboard-visibility-list');
+            const parentSelect = document.getElementById('q-parent');
+            
+            const eligibleParents = configList.filter(q => q.input_type === 'yes_no' || q.input_type === 'radio_list');
+            parentSelect.innerHTML = '<option value="">Aucune (Toujours visible)</option>' + 
+                eligibleParents.map(q => `<option value="${q.id}">${q.label} (${q.input_type === 'yes_no' ? 'Oui/Non' : 'Choix'})</option>`).join('');
+                
+            dashList.innerHTML = configList.map(c => {
+                if(c.input_type === 'textarea') return ''; 
+                const isVisible = c.dashboard_section !== 'hidden';
+                const displayLabel = c.dashboard_label && c.dashboard_label.trim() !== '' ? c.dashboard_label : c.label;
+                return `<div class="flex items-center justify-between p-4 bg-white rounded-xl border ${isVisible ? 'border-blue-200 shadow-sm' : 'border-gray-100 opacity-60'} transition"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center ${isVisible ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}"><i class="fa-solid ${isVisible ? 'fa-chart-pie' : 'fa-eye-slash'}"></i></div><div><div class="font-bold text-sm text-gray-900 truncate max-w-[200px]">${displayLabel}</div><div class="text-[10px] text-gray-400 uppercase tracking-widest">${c.input_type}</div></div></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer" onchange="toggleDashboardVisibility('${c.id}', this.checked, '${c.input_type}')" ${isVisible ? 'checked' : ''}><div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div></label></div>`;
+            }).join('');
+
+            const questList = document.getElementById('questions-list');
+            const parents = configList.filter(q => !q.parent_question_id).sort((a,b) => a.order_index - b.order_index);
+            const children = configList.filter(q => q.parent_question_id);
+
+            questList.innerHTML = parents.map((p, parentIndex) => {
+                const myChildren = children.filter(c => c.parent_question_id === p.id).sort((a,b) => a.order_index - b.order_index);
+                const hasChildren = myChildren.length > 0;
+                const target = p.target_audience || 'ALL';
+                let targetBadge = target === 'ALL' ? '<span class="ml-2 text-[9px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full uppercase tracking-widest">Tous</span>' : (target === 'CDI' ? '<span class="ml-2 text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full uppercase tracking-widest">CDI</span>' : '<span class="ml-2 text-[9px] font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase tracking-widest">Stagiaire</span>');
+                const arrowBtn = hasChildren ? `<button onclick="toggleChildren('${p.id}')" class="ml-3 text-gray-400 hover:text-blue-600 transition w-6 h-6 flex items-center justify-center bg-gray-50 rounded-full"><i id="arrow-${p.id}" class="fa-solid fa-chevron-down text-xs"></i></button>` : '';
+
+                let childrenHTML = '';
+                if (hasChildren) {
+                    childrenHTML = `<div id="children-${p.id}" class="hidden ml-8 mt-3 mb-1 space-y-2 border-l-2 border-orange-200 pl-4 py-1">
+                        ${myChildren.map((c, childIndex) => { 
+                            const cTarget = c.target_audience || 'ALL';
+                            let condText = 'Oui';
+                            try { let parsed = JSON.parse(c.parent_answer_condition || '["Oui"]'); condText = Array.isArray(parsed) ? parsed.join(' OU ') : parsed; } catch(e) { condText = c.parent_answer_condition || 'Oui'; }
+                            let cTargetBadge = cTarget === 'ALL' ? '<span class="ml-2 text-[9px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full uppercase">Tous</span>' : (cTarget === 'CDI' ? '<span class="ml-2 text-[9px] font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full uppercase">CDI</span>' : '<span class="ml-2 text-[9px] font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Stagiaire</span>');
+                            cTargetBadge += `<span class="ml-2 text-[9px] font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full uppercase truncate max-w-[150px] inline-block align-bottom" title="Si : ${condText}"><i class="fa-solid fa-link mr-1"></i>Si ${condText}</span>`;                            
+                            return `
+                            <div class="flex items-center justify-between p-2.5 bg-orange-50/50 rounded-xl border border-orange-100/50 hover:bg-orange-50 transition cursor-move" draggable="true" ondragstart="dragStartChild(event, '${c.id}')" ondragover="allowDrop(event)" ondrop="dropChild(event, '${c.id}')" ondragend="this.style.opacity='1'">
+                                <div class="flex items-center">
+                                    <div class="text-orange-300 cursor-grab px-2"><i class="fa-solid fa-grip-vertical"></i></div>
+                                    <div class="flex flex-col gap-1 mr-2">
+                                        ${childIndex > 0 ? `<button onclick="moveChild('${c.id}', -1)" class="text-orange-400 hover:text-orange-600 text-[10px]"><i class="fa-solid fa-chevron-up"></i></button>` : '<div class="h-3"></div>'}
+                                        ${childIndex < myChildren.length - 1 ? `<button onclick="moveChild('${c.id}', 1)" class="text-orange-400 hover:text-orange-600 text-[10px]"><i class="fa-solid fa-chevron-down"></i></button>` : '<div class="h-3"></div>'}
+                                    </div>
+                                    <i class="fa-solid fa-level-up-alt fa-rotate-90 text-orange-300 mr-3 text-xs"></i>
+                                    <div class="w-full">
+                                        <span class="font-medium text-sm text-gray-700 block truncate max-w-[300px]">${c.label}</span>
+                                        <div class="flex items-center mt-0.5">
+                                            <span class="text-[9px] font-mono text-gray-400 bg-white px-1 rounded border border-gray-100">${c.id}</span>
+                                            ${cTargetBadge}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="editQuestion('${c.id}')" class="text-gray-400 hover:text-blue-600 w-8 h-8 flex items-center justify-center rounded-lg transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button onclick="deleteQuestion('${c.id}')" class="text-gray-400 hover:text-red-600 w-8 h-8 flex items-center justify-center rounded-lg transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>`;
+                }
+
+                return `
+                <div class="bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition group cursor-move p-3 mb-2 shadow-sm" draggable="true" ondragstart="dragStart(event, '${p.id}')" ondragover="allowDrop(event)" ondrop="drop(event, '${p.id}')" ondragend="this.style.opacity='1'">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="text-gray-300 cursor-grab px-2"><i class="fa-solid fa-grip-vertical"></i></div>
+                            <div class="flex flex-col gap-1 mr-1">
+                                ${parentIndex > 0 ? `<button onclick="moveParent('${p.id}', -1)" class="text-gray-300 hover:text-blue-600 text-[10px]"><i class="fa-solid fa-chevron-up"></i></button>` : '<div class="h-3"></div>'}
+                                ${parentIndex < parents.length - 1 ? `<button onclick="moveParent('${p.id}', 1)" class="text-gray-300 hover:text-blue-600 text-[10px]"><i class="fa-solid fa-chevron-down"></i></button>` : '<div class="h-3"></div>'}
+                            </div>
+                            <div>
+                                <span class="font-medium text-sm text-gray-900 block truncate max-w-[400px]">${p.label}</span>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-[10px] font-mono text-gray-500 bg-gray-100 px-1 rounded">${p.id}</span>
+                                    ${targetBadge}
+                                    ${hasChildren ? `<span class="ml-2 text-[9px] font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full uppercase tracking-widest"><i class="fa-solid fa-link mr-1"></i>${myChildren.length} Liée(s)</span>` : ''}
+                                </div>
+                            </div>
+                            ${arrowBtn}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editQuestion('${p.id}')" class="text-gray-400 hover:text-blue-600 w-8 h-8 flex items-center justify-center bg-gray-50 rounded-lg transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteQuestion('${p.id}')" class="text-gray-400 hover:text-red-600 w-8 h-8 flex items-center justify-center bg-gray-50 rounded-lg transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </div>
+                    </div>
+                    ${childrenHTML}
+                </div>
+                `;
+            }).join('');
+        }
+
+        async function toggleDashboardVisibility(id, isChecked, inputType) {
+            let newSection = 'hidden', newGraph = null;
+            if (isChecked) {
+                if(inputType === 'scale_1_5' || inputType === 'scale_1_10') newSection = 'score';
+                else if(inputType === 'yes_no') newSection = 'binary';
+                else if(inputType === 'radio_list') { newSection = 'graph'; newGraph = 'doughnut'; }
+            }
+            await rhClient.from('questions_master').update({ dashboard_section: newSection, graph_type: newGraph }).eq('id', id);
+            await fetchConfig(); renderDashboard(); renderSettings();
+        }
+
+        function toggleOptionsInput() {
+            const type = document.getElementById('q-type').value;
+            const container = document.getElementById('options-container');
+            if (type === 'radio_list') {
+                container.classList.remove('hidden');
+                document.getElementById('q-options').required = true;
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('q-options').required = false;
+            }
+        }
+
+        function updateParentConditionOptions() {
+            const parentId = document.getElementById('q-parent').value;
+            const container = document.getElementById('q-parent-condition-container');
+            container.innerHTML = ''; 
+
+            if (!parentId) {
+                container.innerHTML = '<span class="text-xs text-gray-400 italic">Sélectionnez un parent...</span>';
+                return;
+            }
+
+            const parentQ = configList.find(q => q.id === parentId);
+            
+            if (parentQ) {
+                let options = [];
+                if (parentQ.input_type === 'yes_no') {
+                    options = ['Oui', 'Non'];
+                } else if (parentQ.input_type === 'radio_list' && parentQ.options) {
+                    options = parentQ.options;
+                }
+
+                container.innerHTML = options.map((opt, i) => `
+                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                        <input type="checkbox" name="parent_conditions" value="${opt}" class="w-4 h-4 text-orange-600 rounded border-orange-300 focus:ring-orange-500">
+                        <span class="text-gray-700">${opt}</span>
+                    </label>
+                `).join('');
+            }
+        }
+
+        function editQuestion(id) {
+            const q = configList.find(item => item.id === id);
+            if(!q) return;
+
+            document.getElementById('q-id').value = q.id;
+            document.getElementById('q-id').disabled = true;
+            document.getElementById('q-label').value = q.label;
+            // 💡 Récupération du label court
+            document.getElementById('q-dashboard-label').value = q.dashboard_label || "";
+            document.getElementById('q-type').value = q.input_type;
+            document.getElementById('q-target').value = q.target_audience || 'ALL';
+            document.getElementById('q-parent').value = q.parent_question_id || "";
+            
+            updateParentConditionOptions(); 
+            let storedConditions = [];
+            try {
+                storedConditions = JSON.parse(q.parent_answer_condition || '["Oui"]');
+                if (!Array.isArray(storedConditions)) storedConditions = [q.parent_answer_condition];
+            } catch(e) {
+                storedConditions = [q.parent_answer_condition];
+            }
+            
+            setTimeout(() => {
+                document.querySelectorAll('input[name="parent_conditions"]').forEach(cb => {
+                    if (storedConditions.includes(cb.value)) cb.checked = true;
+                });
+            }, 10);
+
+            if(q.options && Array.isArray(q.options)) {
+                document.getElementById('q-options').value = q.options.join(', ');
+            } else {
+                document.getElementById('q-options').value = '';
+            }
+            
+            toggleOptionsInput(); 
+
+            document.getElementById('form-mode').value = 'update';
+            const submitBtn = document.getElementById('btn-submit-question');
+            submitBtn.textContent = "Sauvegarder les modifications";
+            submitBtn.classList.replace('bg-gray-900', 'bg-blue-600');
+            submitBtn.classList.replace('hover:bg-black', 'hover:bg-blue-700');
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            
+            document.getElementById('add-question-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('add-question-form').reset();
+            document.getElementById('form-mode').value = 'create';
+            document.getElementById('q-id').disabled = false; 
+            document.getElementById('q-target').value = 'ALL'; 
+            document.getElementById('q-parent').value = ''; 
+            
+            updateParentConditionOptions();
+
+            document.getElementById('btn-submit-question').textContent = "Ajouter au Formulaire";
+            document.getElementById('btn-submit-question').classList.replace('bg-blue-600', 'bg-gray-900');
+            document.getElementById('btn-submit-question').classList.replace('hover:bg-blue-700', 'hover:bg-black');
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+            document.getElementById('options-container').classList.add('hidden');
+        }
+
+        document.getElementById('add-question-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const checkedConditions = Array.from(document.querySelectorAll('input[name="parent_conditions"]:checked')).map(cb => cb.value);
+            const parent_answer_condition = JSON.stringify(checkedConditions);
+            
+            const mode = document.getElementById('form-mode').value;
+            const label = document.getElementById('q-label').value;
+            // 💡 Récupération du label court lors de la soumission
+            const dashboard_label = document.getElementById('q-dashboard-label').value;
+            const id = document.getElementById('q-id').value;
+            const input_type = document.getElementById('q-type').value;
+            const target_audience = document.getElementById('q-target').value;
+            const parent_question_id = document.getElementById('q-parent').value || null; 
+            
+            let optionsArray = null;
+            if (input_type === 'radio_list') {
+                const rawOptions = document.getElementById('q-options').value;
+                optionsArray = rawOptions.split(',').map(opt => opt.trim()).filter(opt => opt !== "");
+                if (optionsArray.length < 2) {
+                    Swal.fire({ title: 'Options manquantes', text: 'Veuillez entrer au moins 2 options.', icon: 'warning' });
+                    return;
+                }
+            }
+
+            let dashboard_section = 'hidden'; 
+            let graph_type = null;
+            if (input_type === 'scale_1_5' || input_type === 'scale_1_10') dashboard_section = 'score';
+            else if (input_type === 'yes_no') dashboard_section = 'binary';
+            else if (input_type === 'radio_list') { dashboard_section = 'graph'; graph_type = 'doughnut'; }
+
+            let error = null;
+
+            if (mode === 'create') {
+                // 💡 Ajout du dashboard_label dans l'insertion
+                const res = await rhClient.from('questions_master').insert([{
+                    id, label, dashboard_label, input_type, options: optionsArray, 
+                    dashboard_section, graph_type, order_index: 99, 
+                    is_active: true, target_audience, parent_question_id, parent_answer_condition
+                }]);
+                error = res.error;
+            } else {
+                // 💡 Ajout du dashboard_label dans la mise à jour
+                const res = await rhClient.from('questions_master').update({
+                    label, dashboard_label, input_type, options: optionsArray,
+                    dashboard_section, graph_type, target_audience, parent_question_id, parent_answer_condition 
+                }).eq('id', id);
+                error = res.error;
+            }
+
+            if(error) {
+                Swal.fire({ title: 'Erreur', text: error.message, icon: 'error' });
+            } else {
+                Swal.fire({ title: mode === 'create' ? 'Question ajoutée !' : 'Question modifiée !', icon: 'success', timer: 1500, showConfirmButton: false });
+                resetForm();
+                await fetchConfig();
+                renderSettings();
+                renderDashboard(); 
+            }
+        });
+
+        async function deleteQuestion(id) {
+            Swal.fire({ title: 'Supprimer cette question ?', text: "Elle ne sera plus visible sur le formulaire ni sur le dashboard.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF3B30', cancelButtonColor: '#1d1d1f', confirmButtonText: 'Supprimer', cancelButtonText: 'Annuler' }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await rhClient.from('questions_master').update({ is_active: false }).eq('id', id);
+                    await fetchConfig(); renderDashboard(); renderSettings();
+                    Swal.fire('Retirée !', 'La question a été désactivée.', 'success');
+                }
+            });
+        }
+
+        function dragStart(e, id) { dragSrcId = id; e.dataTransfer.effectAllowed = 'move'; e.target.style.opacity = '0.4'; }
+        function allowDrop(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+        function drop(e, dropId) { e.stopPropagation(); e.preventDefault(); e.target.closest('.cursor-move').style.opacity = '1'; if (dragSrcId !== dropId) reorderParents(dragSrcId, dropId); return false; }
+        function moveParent(parentId, direction) { let parents = configList.filter(q => !q.parent_question_id).sort((a,b) => a.order_index - b.order_index); const currentIndex = parents.findIndex(p => p.id === parentId); const newIndex = currentIndex + direction; if (newIndex >= 0 && newIndex < parents.length) reorderParents(parentId, parents[newIndex].id); }
+
+        async function reorderParents(fromId, toId) {
+            try {
+                let parents = configList.filter(q => !q.parent_question_id || q.parent_question_id === "").sort((a,b) => a.order_index - b.order_index);
+                let children = configList.filter(q => q.parent_question_id && q.parent_question_id !== "");
+                const fromIndex = parents.findIndex(p => p.id === fromId);
+                const toIndex = parents.findIndex(p => p.id === toId);
+                if(fromIndex === -1 || toIndex === -1) return;
+
+                const [movedParent] = parents.splice(fromIndex, 1);
+                parents.splice(toIndex, 0, movedParent);
+
+                let newFlatList = [];
+                let currentIndex = 10; 
+                parents.forEach(p => {
+                    p.order_index = currentIndex; newFlatList.push(p); currentIndex += 10;
+                    const myChildren = children.filter(c => c.parent_question_id === p.id).sort((a,b) => a.order_index - b.order_index);
+                    myChildren.forEach(c => { c.order_index = currentIndex; newFlatList.push(c); currentIndex += 10; });
+                });
+
+                configList = newFlatList; renderSettings(); 
+                const updates = configList.map(item => ({ id: item.id, label: item.label, input_type: item.input_type, order_index: item.order_index }));
+                const { error } = await rhClient.from('questions_master').upsert(updates, { onConflict: 'id' });
+                if (error) throw error;
+            } catch (err) {
+                console.error("Erreur de tri:", err);
+                await fetchConfig(); renderSettings();
+            }
+        }
+
+        function toggleChildren(parentId) {
+            const childrenDiv = document.getElementById('children-' + parentId);
+            const arrowIcon = document.getElementById('arrow-' + parentId);
+            if (childrenDiv.classList.contains('hidden')) { childrenDiv.classList.remove('hidden'); arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-up'); } 
+            else { childrenDiv.classList.add('hidden'); arrowIcon.classList.replace('fa-chevron-up', 'fa-chevron-down'); }
+        }
+
+        let dragSrcChildId = null;
+        function dragStartChild(e, id) { e.stopPropagation(); dragSrcChildId = id; e.dataTransfer.effectAllowed = 'move'; e.target.style.opacity = '0.4'; }
+        function dropChild(e, dropId) { e.stopPropagation(); e.preventDefault(); e.target.closest('.cursor-move').style.opacity = '1'; if (dragSrcChildId !== dropId) reorderChildren(dragSrcChildId, dropId); return false; }
+        function moveChild(childId, direction) { const child = configList.find(q => q.id === childId); if (!child) return; const siblings = configList.filter(q => q.parent_question_id === child.parent_question_id).sort((a,b) => a.order_index - b.order_index); const currentIndex = siblings.findIndex(c => c.id === childId); const newIndex = currentIndex + direction; if (newIndex >= 0 && newIndex < siblings.length) reorderChildren(childId, siblings[newIndex].id); }
+
+        async function reorderChildren(fromId, toId) {
+            try {
+                const fromChild = configList.find(q => q.id === fromId);
+                const toChild = configList.find(q => q.id === toId);
+                if(!fromChild || !toChild || fromChild.parent_question_id !== toChild.parent_question_id) return; 
+
+                const parentId = fromChild.parent_question_id;
+                let parents = configList.filter(q => !q.parent_question_id || q.parent_question_id === "").sort((a,b) => a.order_index - b.order_index);
+                let allChildren = configList.filter(q => q.parent_question_id && q.parent_question_id !== "");
+                let siblings = allChildren.filter(q => q.parent_question_id === parentId).sort((a,b) => a.order_index - b.order_index);
+                let otherChildren = allChildren.filter(q => q.parent_question_id !== parentId);
+
+                const fromIndex = siblings.findIndex(c => c.id === fromId);
+                const toIndex = siblings.findIndex(c => c.id === toId);
+                const [movedChild] = siblings.splice(fromIndex, 1);
+                siblings.splice(toIndex, 0, movedChild);
+
+                let newFlatList = [];
+                let currentIndex = 10; 
+                parents.forEach(p => {
+                    p.order_index = currentIndex; newFlatList.push(p); currentIndex += 10;
+                    let myChildren = (p.id === parentId) ? siblings : otherChildren.filter(c => c.parent_question_id === p.id).sort((a,b) => a.order_index - b.order_index);
+                    myChildren.forEach(c => { c.order_index = currentIndex; newFlatList.push(c); currentIndex += 10; });
+                });
+
+                configList = newFlatList; renderSettings(); 
+                const childrenDiv = document.getElementById('children-' + parentId);
+                const arrowIcon = document.getElementById('arrow-' + parentId);
+                if (childrenDiv) { childrenDiv.classList.remove('hidden'); arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-up'); }
+
+                const updates = configList.map(item => ({ id: item.id, label: item.label, input_type: item.input_type, order_index: item.order_index }));
+                const { error } = await rhClient.from('questions_master').upsert(updates, { onConflict: 'id' });
+                if (error) throw error;
+            } catch (err) {
+                console.error("Erreur tri enfant:", err);
+                await fetchConfig(); renderSettings();
+            }
+        }
+
+        async function switchTab(tab) {
+            document.getElementById('stats-content').classList.toggle('hidden', tab !== 'dashboard');
+            document.getElementById('tab-responses').classList.toggle('hidden', tab !== 'responses'); 
+            document.getElementById('settings-view').classList.toggle('hidden', tab !== 'settings');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-btn-active'));
+            document.getElementById('btn-' + tab)?.classList.add('nav-btn-active');
+            
+            if(tab === 'dashboard') { await fetchData(); renderDashboard(); }
+            if(tab === 'responses') { await fetchData(); renderTable(); unreadCount = 0; updateBadgeUI(); } 
+        }
+
+        function openChartModal(key, title, type) {
+            const ctx = document.getElementById('modal-canvas').getContext('2d'); if (activeChart) activeChart.destroy();
+            document.getElementById('modal-chart').classList.remove('hidden'); document.getElementById('chart-modal-title').textContent = title;
+            const counts = countAnswers(filteredResponses, key);
+            activeChart = new Chart(ctx, { type: type, data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: appleColors, borderWeight:0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+        }
+        function closeChartModal() { document.getElementById('modal-chart').classList.add('hidden'); if(activeChart) activeChart.destroy(); }
+        function countAnswers(data, key) { 
+            return data.reduce((acc, curr) => { 
+                const val = curr.answers?.[key] || curr[key]; 
+                // On exclut les valeurs indéfinies, vides ou "N/A"
+                if (val && val !== 'N/A' && val.trim() !== '') {
+                    acc[val] = (acc[val] || 0) + 1; 
+                }
+                return acc; 
+            }, {}); 
+        }
+        function getTop(obj) { const k = Object.keys(obj); if(!k.length) return '-'; return k.reduce((a, b) => obj[a] > obj[b] ? a : b); }
+        function initGradeFilters() { const grades = [...new Set(allResponses.map(item => item.fonction))].filter(Boolean); const c = document.getElementById('grade-checkboxes'); c.innerHTML = ''; grades.forEach(g => c.innerHTML += `<label class="cursor-pointer"><input type="checkbox" value="${g}" checked onchange="updateFilters()" class="grade-cb hidden"><div class="px-4 py-2 bg-white rounded-full border border-gray-200 text-xs font-bold transition hover:border-blue-500 select-none text-gray-600">${g}</div></label>`); }
+        function updateFilters() { const checked = Array.from(document.querySelectorAll('.grade-cb:checked')).map(cb => cb.value); filteredResponses = checked.length ? allResponses.filter(d => checked.includes(d.fonction)) : []; renderDashboard(); }
+
+        function setupRealtime() {
+            rhClient.channel('schema-db-changes').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offboarding_responses_v2' }, (payload) => {
+                console.log('Nouveau bilan reçu !', payload.new);
+                unreadCount++; updateBadgeUI();
+                Swal.fire({ toast: true, position: 'top-end', icon: 'info', title: `Nouveau bilan de ${payload.new.collaborateur}`, showConfirmButton: false, timer: 3000 });
+            }).subscribe();
+        }
+
+        async function startApp() {
+            const splash = document.getElementById('splash-screen');
+            const loginView = document.getElementById('login-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            loginView.classList.add('hidden'); splash.style.display = 'flex';
+            setTimeout(() => { splash.style.opacity = '1'; }, 10);
+            await Promise.all([fetchConfig(), fetchData()]);
+            initGradeFilters(); renderDashboard(); renderSettings(); setupRealtime();
+            setTimeout(() => {
+                splash.style.opacity = '0'; 
+                setTimeout(() => { splash.style.display = 'none'; dashboardView.classList.remove('hidden'); }, 200);
+            }, 1000); 
+        }
+
+        function updateBadgeUI() {
+            const badge = document.getElementById('notif-badge');
+            if (unreadCount > 0) { badge.textContent = unreadCount; badge.classList.remove('hidden'); } 
+            else { badge.classList.add('hidden'); }
+        }
+
+    </script>
+</body>
+</html>
